@@ -3,7 +3,6 @@ import { body } from 'express-validator'
 import mongoose from 'mongoose'
 
 import { requireAuth, validateRequest, BadRequestError, NotFoundError, OrderStatus } from '@hvag-tkt/shared'
-
 import { Order } from '../models/order'
 import { Ticket } from '../models/ticket'
 import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher'

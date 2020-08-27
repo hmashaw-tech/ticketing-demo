@@ -7,7 +7,7 @@ import { Payment } from '../../models/payment'
 import { natsWrapper } from '../../nats-wrapper'
 import { stripe } from '../../stripe'
 
-// jest.mock('../../stripe')
+jest.mock('../../stripe')
 
 it('has a route handler listening to /api/payments for post requests', async () => {
     const response = await request(app)
@@ -117,41 +117,41 @@ it('returns 400 if purchasing a cancelled order', async () => {
 // })
 
 // When live
-it('returns 204 if all good', async () => {
-    const userId = mongoose.Types.ObjectId().toHexString()
+// it('returns 204 if all good', async () => {
+//     const userId = mongoose.Types.ObjectId().toHexString()
 
-    const price = Math.floor(Math.random() * 100000)
+//     const price = Math.floor(Math.random() * 100000)
 
-    const order = Order.build({
-        id: mongoose.Types.ObjectId().toHexString(),
-        userId,
-        version: 0,
-        price,
-        status: OrderStatus.Created
-    })
-    await order.save()
+//     const order = Order.build({
+//         id: mongoose.Types.ObjectId().toHexString(),
+//         userId,
+//         version: 0,
+//         price,
+//         status: OrderStatus.Created
+//     })
+//     await order.save()
 
-    await request(app)
-    .post('/api/payments')
-    .set('Cookie', global.getCookie(userId))
-    .send({
-        token: 'tok_visa',
-        orderId: order.id
-    })
-    .expect(201)
+//     await request(app)
+//     .post('/api/payments')
+//     .set('Cookie', global.getCookie(userId))
+//     .send({
+//         token: 'tok_visa',
+//         orderId: order.id
+//     })
+//     .expect(201)
 
-    const stripeCharges = await stripe.charges.list({ limit: 10 })
-    const stripeCharge = stripeCharges.data.find(charge => {
-        return charge.amount === price * 100
-    })
+//     const stripeCharges = await stripe.charges.list({ limit: 10 })
+//     const stripeCharge = stripeCharges.data.find(charge => {
+//         return charge.amount === price * 100
+//     })
     
-    expect(stripeCharge).toBeDefined()
-    expect(stripeCharge?.currency).toEqual('usd')
+//     expect(stripeCharge).toBeDefined()
+//     expect(stripeCharge?.currency).toEqual('usd')
 
-    const payment = await Payment.findOne({
-        orderId: order.id,
-        stripeId: stripeCharge!.id
-    })
+//     const payment = await Payment.findOne({
+//         orderId: order.id,
+//         stripeId: stripeCharge!.id
+//     })
 
-    expect(payment).not.toBeNull()
-})
+//     expect(payment).not.toBeNull()
+// })

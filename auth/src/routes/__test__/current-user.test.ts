@@ -1,6 +1,5 @@
 import request from 'supertest'
 import { app } from '../../app'
-import { signupRouter } from '../signup'
 
 it('returns details of current user', async () => {
     const cookie = await global.getCookie()

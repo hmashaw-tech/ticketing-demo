@@ -1,0 +1,24 @@
+name: deploy-auth
+
+on:
+  push:
+    branches: 
+    - master
+    paths:
+    - 'auth/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Docker Build
+      run: cd auth && docker build -t markshaw/tkt-auth .
+    - name: Docker Login
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      env:
+        DOCKER_USERNAME: ${{ secrets. DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets. DOCKER_PASSWORD }}
+    - name: Docker Push
+      run: docker push markshaw/tkt-auth

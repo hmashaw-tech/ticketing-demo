@@ -14,7 +14,7 @@ declare global {
 }
 
 // If not mock
-process.env.STRIPE_KEY = process.env.STRIPE_KEY
+// process.env.STRIPE_KEY = process.env.STRIPE_KEY
 
 jest.mock('../nats-wrapper')
 

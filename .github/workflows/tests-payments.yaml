@@ -9,5 +9,5 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Run Test
-      run: cd payments && npm install && npm run test:ci
+    #- name: Run Test
+      #run: cd payments && npm install && npm run test:ci

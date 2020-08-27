@@ -7,7 +7,7 @@ import { Payment } from '../../models/payment'
 import { natsWrapper } from '../../nats-wrapper'
 import { stripe } from '../../stripe'
 
-// jest.mock('../../stripe')
+jest.mock('../../stripe')
 
 it('has a route handler listening to /api/payments for post requests', async () => {
     const response = await request(app)

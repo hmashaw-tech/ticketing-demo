@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: tkt-payments-srv
+
+spec:
+  selector:
+    app: tkt-payments
+    
+  ports:
+  - name: tkt-payments
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tkt-payments-depl
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tkt-payments
+
+  template:
+    metadata:
+      labels:
+        app: tkt-payments
+    spec:
+      containers:
+      - name: tkt-payments
+        image: markshaw/tkt-payments
+        env:
+        - name: JWT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: JWT_KEY
+        - name: STRIPE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stripe-secret
+              key: STRIPE_KEY
+        - name: MONGO_URI
+          value: 'mongodb://tkt-payments-mongo-srv:27017/payments'
+        - name: NATS_CLUSTER_ID
+          value: ticketing
+        - name: NATS_CLIENT_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NATS_URL
+          value: 'http://tkt-nats-srv:4222'
+        ports:
+        - containerPort: 3000

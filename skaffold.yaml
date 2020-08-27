@@ -1,0 +1,71 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+
+metadata:
+  name: tkt
+
+build:
+  local:
+    push: false
+
+  artifacts:
+  - context: auth
+    image: markshaw/tkt-auth
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - src: 'src/**/*.ts'
+        dest: .
+
+  - context: tickets
+    image: markshaw/tkt-tickets
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - src: 'src/**/*.ts'
+        dest: .
+
+  - context: orders
+    image: markshaw/tkt-orders
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - src: 'src/**/*.ts'
+        dest: .
+
+  - context: expiration
+    image: markshaw/tkt-expiration
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - src: '**/*.js'
+        dest: .
+
+  - context: payments
+    image: markshaw/tkt-payments
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - src: '**/*.js'
+        dest: .
+        
+  - context: client
+    image: markshaw/tkt-client
+    docker:
+      dockerfile: Dockerfile
+    sync:
+      manual:
+      - src: '**/*.js'
+        dest: .
+
+
+deploy:
+  kubectl:
+    manifests:
+    - ./infra/k8s/*
+

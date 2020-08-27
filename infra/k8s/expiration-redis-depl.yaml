@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: tkt-exp-redis-srv
+
+spec:
+  selector:
+    app: tkt-exp-redis
+    
+  ports:
+  - name: db
+    protocol: TCP
+    port: 6379
+    targetPort: 6379
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tkt-exp-redis-depl
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tkt-exp-redis
+
+  template:
+    metadata:
+      labels:
+        app: tkt-exp-redis
+    spec:
+      containers:
+      - name: tkt-exp-redis
+        image: redis
+        ports:
+        - containerPort: 6379

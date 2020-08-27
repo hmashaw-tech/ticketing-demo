@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: tkt-tickets-srv
+
+spec:
+  selector:
+    app: tkt-tickets
+    
+  ports:
+  - name: tkt-tickets
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tkt-tickets-depl
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tkt-tickets
+
+  template:
+    metadata:
+      labels:
+        app: tkt-tickets
+    spec:
+      containers:
+      - name: tkt-tickets
+        image: markshaw/tkt-tickets
+        env:
+        - name: JWT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: JWT_KEY
+        - name: MONGO_URI
+          value: 'mongodb://tkt-tickets-mongo-srv:27017/tickets'
+        - name: NATS_CLUSTER_ID
+          value: ticketing
+        - name: NATS_CLIENT_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NATS_URL
+          value: 'http://tkt-nats-srv:4222'
+        ports:
+        - containerPort: 3000

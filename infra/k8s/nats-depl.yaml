@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: tkt-nats-srv
+
+spec:
+  selector:
+    app: tkt-nats
+    
+  ports:
+  - name: client
+    protocol: TCP
+    port: 4222
+    targetPort: 4222
+    
+  - name: monitoring
+    protocol: TCP
+    port: 8222
+    targetPort: 8222
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tkt-nats-depl
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tkt-nats
+
+  template:
+    metadata:
+      labels:
+        app: tkt-nats
+    spec:
+      containers:
+      - name: tkt-nats
+        image: nats-streaming:0.17.0
+        args: [
+          '-p', '4222',
+          '-m', '8222',
+          '-hbi', '5s',
+          '-hbt', '5s',
+          '-hbf', '2',
+          '-SD',
+          '-cid', 'ticketing'
+        ]
+        ports:
+        - containerPort: 4222
+        - containerPort: 8222

@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: tkt-client-srv
+
+spec:
+  selector:
+    app: tkt-client
+    
+  ports:
+  - name: tkt-client
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tkt-client-depl
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tkt-client
+
+  template:
+    metadata:
+      labels:
+        app: tkt-client
+    spec:
+      containers:
+      - name: tkt-client
+        image: markshaw/tkt-client
+        env:
+        - name: JWT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: JWT_KEY
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/.env.local
+          subPath: .env.local
+        ports:
+        - containerPort: 3000
+      
+      volumes:
+      - name: config-volume
+        configMap:
+            name: stripe-secret-p
+            items:
+            - key: STRIPE_KEY_P
+              path: .env.local
+

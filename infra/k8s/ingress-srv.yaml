@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+
+metadata:
+  name: ingress-srv
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"
+
+spec:
+  rules:
+  - host: demoapp.kubernetes.shawmer.com
+    http:
+      paths:
+      - path: /api/users/?(.*)
+        backend:
+          serviceName: tkt-auth-srv
+          servicePort: 3000
+
+      - path: /api/tickets/?(.*)
+        backend:
+          serviceName: tkt-tickets-srv
+          servicePort: 3000
+
+      - path: /api/orders/?(.*)
+        backend:
+          serviceName: tkt-orders-srv
+          servicePort: 3000
+
+      - path: /api/payments/?(.*)
+        backend:
+          serviceName: tkt-payments-srv
+          servicePort: 3000
+
+      - path: /?(.*)
+        backend:
+          serviceName: tkt-client-srv
+          servicePort: 3000
+

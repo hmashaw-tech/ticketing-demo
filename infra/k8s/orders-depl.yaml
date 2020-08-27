@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: tkt-orders-srv
+
+spec:
+  selector:
+    app: tkt-orders
+    
+  ports:
+  - name: tkt-orders
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tkt-orders-depl
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tkt-orders
+
+  template:
+    metadata:
+      labels:
+        app: tkt-orders
+    spec:
+      containers:
+      - name: tkt-orders
+        image: markshaw/tkt-orders
+        env:
+        - name: JWT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: JWT_KEY
+        - name: MONGO_URI
+          value: 'mongodb://tkt-orders-mongo-srv:27017/orders'
+        - name: NATS_CLUSTER_ID
+          value: ticketing
+        - name: NATS_CLIENT_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NATS_URL
+          value: 'http://tkt-nats-srv:4222'
+        ports:
+        - containerPort: 3000

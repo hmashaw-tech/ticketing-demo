@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tkt-exp-depl
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tkt-expiration
+
+  template:
+    metadata:
+      labels:
+        app: tkt-expiration
+    spec:
+      containers:
+      - name: tkt-expiration
+        image: markshaw/tkt-expiration
+        env:
+        - name: REDIS_HOST
+          value: tkt-exp-redis-srv
+        - name: NATS_CLUSTER_ID
+          value: ticketing
+        - name: NATS_CLIENT_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NATS_URL
+          value: 'http://tkt-nats-srv:4222'
+        resources:
+          limits:
+            cpu: "1"
+            memory: "256Mi"

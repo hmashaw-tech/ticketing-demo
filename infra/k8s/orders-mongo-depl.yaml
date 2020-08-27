@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: tkt-orders-mongo-srv
+
+spec:
+  selector:
+    app: tkt-orders-mongo
+    
+  ports:
+  - name: db
+    protocol: TCP
+    port: 27017
+    targetPort: 27017
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tkt-orders-mongo-depl
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tkt-orders-mongo
+
+  template:
+    metadata:
+      labels:
+        app: tkt-orders-mongo
+    spec:
+      containers:
+      - name: tkt-orders-mongo
+        image: mongo
+        ports:
+        - containerPort: 27017
